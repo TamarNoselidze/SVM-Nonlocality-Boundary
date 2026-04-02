@@ -2,7 +2,7 @@ using QuantumInformation
 using LinearAlgebra
 using HDF5
 
-n = 100
+n = 5000
 dim = 4 
 # states = zeros(ComplexF64, dim, dim, n)
 
