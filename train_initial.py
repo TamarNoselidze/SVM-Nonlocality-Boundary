@@ -3,6 +3,7 @@ import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
 from sklearn.metrics import classification_report, accuracy_score
+import joblib
 
 
 from convert_to_T import extract_9d_features, extract_t_matrix_features
@@ -142,6 +143,10 @@ for i in range(9):
             sign = "+" if cross_coeff > 0 else "-"
             formula_str += f"       {sign} {abs(cross_coeff):.4f} * x_{i+1}*x_{j+1}\n"
 
-
-
 print(formula_str)
+
+
+
+model_filename = 'svm_poly_degree3_model.pkl'
+joblib.dump(svm_model, model_filename)
+print(f"\nModel successfully saved to {model_filename}")
