@@ -7,6 +7,10 @@ using .CAPIBARA
 pol = polytope_spherical_covering(92)
 s = shrinking_factor(pol)
 
+pol_2 = polytope_spherical_covering(122)
+s_2 = shrinking_factor(pol_2)
+
+
 ρ = deserialize("random_ent_states.dat")
 
 first_index = 2
@@ -22,7 +26,19 @@ for i ∈ first_index:last_index
         is_lhs[count] = 1
     elseif v_lower / s ≤ 1 - 1e-5
         is_lhs[count] = -1
-    end
+    else
+        println("  State $i is ambiguous. Testing with pol_2")
+        
+        v_lower_2 = visibility_steering_cr(ρ[i], pol_2; solver = Mosek.Optimizer)
+        
+        if v_lower_2 ≥ 1 - 1e-5
+            is_lhs[count] = 1   # Resolved as LHS with pol_2
+        elseif v_lower_2 / s_2 ≤ 1 - 1e-5
+            is_lhs[count] = -1  # Resolved as steerable with pol_2
+        else
+            println("  State $i remains ambiguous even with pol_2.")
+            is_lhs[count] = 0   # 0 indicates it is still unresolved
+        end
     global count += 1
 end
 
