@@ -30,6 +30,7 @@ for i ∈ first_index:last_index
         println("  State $i is ambiguous. Testing with pol_2")
         
         v_lower_2 = visibility_steering_cr(ρ[i], pol_2; solver = Mosek.Optimizer)
+        # v_upper_2 = visibility_steering_cr(ρ[i], pol_2; upper=true, solver = Mosek.Optimizer)
         
         if v_lower_2 ≥ 1 - 1e-5
             is_lhs[count] = 1   # Resolved as LHS with pol_2
@@ -39,6 +40,7 @@ for i ∈ first_index:last_index
             println("  State $i remains ambiguous even with pol_2.")
             is_lhs[count] = 0   # 0 indicates it is still unresolved
         end
+    end
     global count += 1
 end
 

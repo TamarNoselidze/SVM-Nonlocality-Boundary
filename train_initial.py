@@ -11,20 +11,54 @@ from convert_to_T import extract_9d_features, extract_t_matrix_features
 
 
 with h5py.File('random_ent_states_array.h5', 'r') as f:
-    raw_data = np.array(f['rho'])
+    raw_data = np.array(f['rho'][:2000])
     if raw_data.dtype.names is not None and 'r' in raw_data.dtype.names:
         states = raw_data['r'] + 1j * raw_data['i']
     else:
         states = raw_data
 
 
+# with h5py.File('non_lhs_boundary_states.h5', 'r') as f:
+#     raw_data = np.array(f['rho'][:800])
+#     if raw_data.dtype.names is not None and 'r' in raw_data.dtype.names:
+#         nlhs_states = raw_data['r'] + 1j * raw_data['i']
+#     else:
+#         nlhs_states = raw_data
+
+with h5py.File('stress_states.h5', 'r') as f:
+    raw_data = np.array(f['rho'][:800])
+    if raw_data.dtype.names is not None and 'r' in raw_data.dtype.names:
+        stress_states = raw_data['r'] + 1j * raw_data['i']
+    else:
+        stress_states = raw_data
+
+all_states = np.concatenate((states, stress_states), axis=0)
+
+print(f"Total states: {all_states.shape[0]}")
+print(f"Data type: {all_states.dtype}")
+
 
 with h5py.File('random_ent_labels.h5', 'r') as f:
-    raw_columns = np.array(f['labels'])
+    raw_columns = np.array(f['labels'][:2000])
     if raw_columns.dtype.names is not None and 'l' in raw_columns.dtype.names:
         labels = raw_columns['l'] 
     else:
         labels = raw_columns
+
+
+# with h5py.File('non_lhs_boundary_labels.h5', 'r') as f:
+#     raw_columns = np.array(f['labels'][:800])
+#     if raw_columns.dtype.names is not None and 'l' in raw_columns.dtype.names:
+#         nlhs_labels = raw_columns['l'] 
+#     else:
+#         nlhs_labels = raw_columns
+
+with h5py.File('stress_labels.h5', 'r') as f:
+    raw_columns = np.array(f['labels'][:800])
+    if raw_columns.dtype.names is not None and 'l' in raw_columns.dtype.names:
+        stress_labels = raw_columns['l'] 
+    else:
+        stress_labels = raw_columns
 
 
 # print(labels.shape)
@@ -36,13 +70,13 @@ with h5py.File('random_ent_labels.h5', 'r') as f:
 #         labels_2 = raw_columns_2
 
 
-# all_labels = np.concatenate((labels, labels_2)).astype(int)
+all_labels = np.concatenate((labels, stress_labels)).astype(int)
 
 
 # filter out ambiguous states
-valid_indices = labels != 0
-filtered_states = states[valid_indices]
-filtered_labels = labels[valid_indices]
+valid_indices = all_labels != 0
+filtered_states = all_states[valid_indices]
+filtered_labels = all_labels[valid_indices]
 
 print(f"Total states after filtering ambiguous ones (label 0): {len(filtered_labels)}")
 
@@ -75,7 +109,8 @@ print(f"Training on {len(y_train)} states, Testing on {len(y_test)} states...\n"
 # svm_model = SVC(kernel='rbf', C=1.0, gamma='scale', class_weight='balanced')
 # # svm_model = SVC(decision_function_shape='ovo')
 
-svm_model = SVC(kernel='poly', degree=3)
+degree=4
+svm_model = SVC(kernel='poly', degree=degree)
 
 
 svm_model.fit(X_train, y_train)
@@ -147,6 +182,34 @@ print(formula_str)
 
 
 
-model_filename = 'svm_poly_degree3_model.pkl'
-joblib.dump(svm_model, model_filename)
-print(f"\nModel successfully saved to {model_filename}")
+# model_filename = f'svm_poly_degree{degree}_model.pkl'
+# joblib.dump(svm_model, model_filename)
+# print(f"\nModel successfully saved to {model_filename}")
+
+
+
+with h5py.File("stress_states.h5", "r") as f:
+    stress_states = f["rho"][801:]
+with h5py.File("stress_labels.h5", "r") as f:
+    stress_labels = f["labels"][801:]
+
+
+
+# with h5py.File("non_lhs_boundary_states.h5", "r") as f:
+#     nlhs_states = f["rho"][801:]
+# with h5py.File("non_lhs_boundary_labels.h5", "r") as f:
+#     nlhs_labels = f["labels"][801:]
+
+# X_eval = np.concatenate((stress_states, nlhs_states), axis=0)
+# y_eval = np.concatenate((stress_labels, nlhs_labels)).astype(int)
+
+X_eval = stress_states
+y_eval = stress_labels
+X_stress = extract_9d_features(X_eval)
+
+stress_predictions = svm_model.predict(X_stress)
+
+# 4. Evaluate
+print(f"Stress Test Accuracy: {accuracy_score(y_eval, stress_predictions):.2%}")
+print("\nClassification Report:")
+print(classification_report(y_eval, stress_predictions, target_names=["Non-LHS (-1)", "LHS (1)"]))
