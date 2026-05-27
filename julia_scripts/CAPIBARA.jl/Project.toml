@@ -1,0 +1,32 @@
+name = "CAPIBARA"
+uuid = "bf4f485c-c13c-4555-af41-2b2313ea478c"
+authors = ["lucporto <lporto@ifi.unicamp.br>"]
+version = "0.1.0"
+
+[deps]
+HiGHS = "87dc4568-4c63-4d18-b0c0-bb2238e4078b"
+Hypatia = "b99e6be6-89ff-11e8-14f8-45c827f4f8f2"
+JuMP = "4076af6c-e467-56ae-b986-b466b2749572"
+Ket = "412c778c-4733-41d8-b706-9e072557ba34"
+LinearAlgebra = "37e2e46d-f89d-539d-b4ee-838fcccc9c8e"
+Polyhedra = "67491407-f73d-577b-9b50-8179a7c68029"
+Serialization = "9e88b42a-f829-5b0c-bbe9-9e923198166b"
+StaticArrays = "90137ffa-7385-5640-81b9-e52037218182"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[compat]
+HiGHS = "1.20.1"
+Hypatia = "0.9.1"
+JuMP = "1.28.0"
+Ket = "0.9.1"
+LinearAlgebra = "1.11.0"
+Polyhedra = "0.8.1"
+Serialization = "1.11.0"
+StaticArrays = "1.9.16"
+Test = "1.11.0"
+
+[extras]
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
+
+[targets]
+test = ["Test"]
