@@ -33,7 +33,7 @@ The repository is roughly divided into two pipelines: **Data Generation** (Julia
 │   ├── convert_to_T.py              # Helper functions for 9D Fano feature extraction
 │   └── evaluate_werner.py           # Plots the model's decision function against Werner states
 └── README.md
-
+```
 
 ## Dependencies
 
@@ -77,19 +77,11 @@ The Python pipeline loads the `.h5` files, applies a Singular Value Decompositio
 python python_ml/train_initial.py
 ```
 
-Running this script will output the model's accuracy, classification report, and automatically print the Analytical Nonlocality Formula (the extracted SVM weights from the $d=2$ polynomial kernel).
+Running this script will output the model's accuracy, classification report, and automatically print the Analytical Nonlocality Formula (the extracted SVM weights from the polynomial kernel).
 
-### 3. Evaluating on Werner States
 
-To verify the physical validity of the model, you can test the trained SVM against the Werner state family.
 
-```bash
-python python_ml/evaluate_werner.py
-```
 
-This will generate a plot comparing the model's decision boundary $f(p)$ to the exact theoretical truth ($p = 0.5$), demonstrating the geometric superiority of the Phase 2 targeted dataset.
-
----
 
 ## Key Results
 
